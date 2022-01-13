@@ -121,7 +121,7 @@ public class Main : MonoBehaviour
             GameObject obj = _roles[i];
             Role roleScript = obj.GetComponent<Role>();
             ECSRole eCSRole = obj.AddComponent<ECSRole>();
-            eCSRole.Init(roleScript.posx, roleScript.posx, roleScript.index, roleScript.path);
+            eCSRole.Init(roleScript.posx, roleScript.posy, roleScript.index, roleScript.path);
             _ECSRoles.Add(eCSRole);
         }
         _roles.Clear();
