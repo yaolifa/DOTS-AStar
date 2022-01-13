@@ -4,4 +4,5 @@ public enum EventName
     UpdateMapSize,
     AddRole,
     InitMap,
+    ECSModel,
 }

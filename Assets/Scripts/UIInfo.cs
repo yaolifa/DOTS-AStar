@@ -8,11 +8,13 @@ public class UIInfo: MonoBehaviour{
     public Text textRoleCount;
     public Button buttonCreatRole;
     public Button buttonCreatMap;
+    public Button buttonECS;
     public Toggle toggleFast;
 
     private void Start() {
         buttonCreatRole.onClick.AddListener(OnClickCreatRole);
         buttonCreatMap.onClick.AddListener(OnClickCreatMap);
+        buttonECS.onClick.AddListener(OnClickECS);
         toggleFast.isOn = Config.fastModel;
         toggleFast.onValueChanged.AddListener(OnToggleChange);
     }
@@ -45,5 +47,9 @@ public class UIInfo: MonoBehaviour{
 
     private void OnToggleChange(bool off){
         Config.fastModel = off;
+    }
+
+    private void OnClickECS(){
+        EventManager.instance.DispatchEvent(EventName.ECSModel);
     }
 }
