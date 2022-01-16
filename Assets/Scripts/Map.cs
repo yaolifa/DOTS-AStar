@@ -6,12 +6,17 @@ public class Map
 {
     private AStart _aStart;
     public int[,] mapData;
-    private int size;
-    private System.Random random = new System.Random();
+    private int _size;
+    public int size{
+        get{
+            return _size;
+        }
+    }
+    private System.Random _random = new System.Random();
     public Map(int size)
     {
         _aStart = new AStart();
-        this.size = size;
+        this._size = size;
         mapData = new int[size, size];
         for (int i = 0; i < size; i++)
         {
@@ -28,12 +33,12 @@ public class Map
         int pos;
         if (x1 == x2)
         {
-            pos = y1 + random.Next((y2 - y1) / 2 + 1) * 2;//在奇数位置开门
+            pos = y1 + _random.Next((y2 - y1) / 2 + 1) * 2;//在奇数位置开门
             mapData[x1, pos] = 0;
         }
         else if (y1 == y2)
         {
-            pos = x1 + random.Next((x2 - x1) / 2 + 1) * 2;
+            pos = x1 + _random.Next((x2 - x1) / 2 + 1) * 2;
             mapData[pos, y1] = 0;
         }
         else
@@ -50,21 +55,21 @@ public class Map
             return;
 
         //横着画线，在偶数位置画线
-        xPos = x + random.Next(height / 2) * 2 + 1;
+        xPos = x + _random.Next(height / 2) * 2 + 1;
         for (int i = y; i < y + width; i++)
         {
             mapData[xPos, i] = 1;
         }
 
         //竖着画一条线，在偶数位置画线
-        yPos = y + random.Next(width / 2) * 2 + 1;
+        yPos = y + _random.Next(width / 2) * 2 + 1;
         for (int i = x; i < x + height; i++)
         {
             mapData[i, yPos] = 1;
         }
 
         // //随机开三扇门，左侧墙壁为1，逆时针旋转
-        int isClosed = random.Next(4) + 1;
+        int isClosed = _random.Next(4) + 1;
         switch (isClosed)
         {
             case 1:
@@ -107,8 +112,8 @@ public class Map
 
     public void GetCanPassPoint(out int x, out int y){
         do{
-			x = UnityEngine.Random.Range(0, size);
-			y = UnityEngine.Random.Range(0, size);
+			x = UnityEngine.Random.Range(0, _size);
+			y = UnityEngine.Random.Range(0, _size);
 		}while(!CanPass(x, y));
     }
 

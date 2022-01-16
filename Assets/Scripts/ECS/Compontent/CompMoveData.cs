@@ -5,4 +5,5 @@ public struct CompMoveData:IComponentData
     public int index;
     public int2 pos;
     public float speed;
+    public int pathLength;
 }

@@ -1,19 +1,19 @@
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 
 public class SystemMovePath : SystemBase
 {
-    private EntityManager _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
     protected override void OnUpdate()
     {
-        // BufferFromEntity<CompPathListData> bufferFromEntity = GetBufferFromEntity<CompPathListData>();
         float deltaTime = Time.DeltaTime;
         Entities
         .WithBurst()
+        .WithNone<CompFindPathParam>()
         .ForEach((ref DynamicBuffer<CompPathListData> dynamicBuffer , ref CompMoveData moveData, ref Translation translation) =>
         {
-            if (moveData.index < dynamicBuffer.Length)
+            if (moveData.index < moveData.pathLength)
             {
                 CompPathListData pathData = dynamicBuffer[moveData.index];
                 int dirX = pathData.pos.x - moveData.pos.x;
@@ -34,8 +34,6 @@ public class SystemMovePath : SystemBase
                 {
                     translation.Value = new float3(x, 0, y);
                 }
-            }else{
-                //TODO AStar
             }
         }).ScheduleParallel();
     }

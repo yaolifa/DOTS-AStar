@@ -2,26 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Entities;
-public class Main : MonoBehaviour
+using Unity.Transforms;
+
+public class Main : SingletonBehaviour<Main>
 {
     public GameObject role;
     public GameObject plane;
     public GameObject obstacle;
     public Transform obstacleRoot;
-    public Transform cameraTransform;
+    public Camera mainCamera;
     private List<GameObject> _obstacles;
     private List<GameObject> _roles;
-    private List<ECSRole> _ECSRoles;
+    private List<RoleEntitiesOwner> _roleEntities;
     private Map _map;
     private Entity _roleEntity;
     private EntityManager _entityManager;
+    public Map map{
+        get{
+            return _map;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         _obstacles = new List<GameObject>();
         _roles = new List<GameObject>();
-        _ECSRoles = new List<ECSRole>();
+        _roleEntities = new List<RoleEntitiesOwner>();
         // RandomCreaterPlane();
         GameObjectConversionSettings settings = GameObjectConversionSettings.FromWorld(
             World.DefaultGameObjectInjectionWorld, null);
@@ -61,13 +68,14 @@ public class Main : MonoBehaviour
     {
         if (Config.isECSModel)
         {
-            for (int i = 0; i < _ECSRoles.Count; i++)
+            for (int i = 0; i < _roleEntities.Count; i++)
             {
-                _entityManager.DestroyEntity(_ECSRoles[i].entity);
-                Destroy(_ECSRoles[i]);
+                DynamicBuffer<Child> child = _entityManager.GetBuffer<Child>(_roleEntities[i].entity);
+                _entityManager.DestroyEntity(child[0].Value);
+                _entityManager.DestroyEntity(_roleEntities[i].entity);
             }
-            _ECSRoles.Clear();
-            EventManager.instance.DispatchEvent<int>(EventName.UpdateRoleCount, _ECSRoles.Count);
+            _roleEntities.Clear();
+            EventManager.instance.DispatchEvent<int>(EventName.UpdateRoleCount, _roleEntities.Count);
         }
         else
         {
@@ -89,12 +97,14 @@ public class Main : MonoBehaviour
             for (int i = 0; i < count; i++)
             {
                 Entity entity = _entityManager.Instantiate(_roleEntity);
-                ECSRole eCSRole = new ECSRole();
-                eCSRole.Convert(entity, _entityManager, null);
-                eCSRole.Init(0, 0, 1);
-                _ECSRoles.Add(eCSRole);
+                RoleEntitiesOwner roleEntitiesOwner = new RoleEntitiesOwner();
+                int x, y;
+                _map.GetCanPassPoint(out x, out y);
+                roleEntitiesOwner.Init(x, y, 1);
+                roleEntitiesOwner.Convert(entity, _entityManager, null);
+                _roleEntities.Add(roleEntitiesOwner);
             }
-            EventManager.instance.DispatchEvent<int>(EventName.UpdateRoleCount, _ECSRoles.Count);
+            EventManager.instance.DispatchEvent<int>(EventName.UpdateRoleCount, _roleEntities.Count);
         }
         else
         {
@@ -116,16 +126,35 @@ public class Main : MonoBehaviour
         if (Config.isECSModel || _map == null) return;
 
         Config.isECSModel = true;
+
+        int size = _map.size;
+        Entity mapEntity = _entityManager.CreateEntity();
+        _entityManager.AddComponent<CompMapFlag>(mapEntity);
+        DynamicBuffer<CompMap> compMaps = _entityManager.AddBuffer<CompMap>(mapEntity);
+
+
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                compMaps.Add(new CompMap{
+                    data = _map.mapData[i, j]
+                });
+            }
+        }
+
         for (int i = 0; i < _roles.Count; i++)
         {
             GameObject obj = _roles[i];
             Role roleScript = obj.GetComponent<Role>();
             ECSRole eCSRole = obj.AddComponent<ECSRole>();
-            eCSRole.Init(roleScript.posx, roleScript.posy, roleScript.index, roleScript.path);
-            _ECSRoles.Add(eCSRole);
+            RoleEntitiesOwner roleEntitiesOwner = new RoleEntitiesOwner();
+            roleEntitiesOwner.Init(roleScript.posx, roleScript.posy, roleScript.index, roleScript.path);
+            eCSRole.roleEntitiesOwner = roleEntitiesOwner;
+            _roleEntities.Add(roleEntitiesOwner);
         }
         _roles.Clear();
-        EventManager.instance.DispatchEvent<int>(EventName.UpdateRoleCount, _ECSRoles.Count);
+        EventManager.instance.DispatchEvent<int>(EventName.UpdateRoleCount, _roleEntities.Count);
     }
 
     public void RandomCreaterPlane()
@@ -138,7 +167,8 @@ public class Main : MonoBehaviour
     public void InitPlane(int size)
     {
         ClearRole();
-        cameraTransform.position = new Vector3(size / 2f, 250, size / 2f);
+        mainCamera.transform.position = new Vector3(size / 2f, 250, size / 2f);
+        mainCamera.orthographicSize = size / 2f;
         for (int i = 0; i < _obstacles.Count; i++)
         {
             Destroy(_obstacles[i]);
@@ -161,5 +191,11 @@ public class Main : MonoBehaviour
         }
         StaticBatchingUtility.Combine(obstacleRoot.gameObject);
         EventManager.instance.DispatchEvent<int>(EventName.UpdateMapSize, size);
+    }
+
+    private void OnApplicationQuit() {
+        if(Tools.pathNodes.IsCreated){
+            Tools.pathNodes.Dispose();
+        }
     }
 }
