@@ -1,2 +1,2 @@
-# FindingPahtTest
+# FindingPathTest
 Unity Astar test
