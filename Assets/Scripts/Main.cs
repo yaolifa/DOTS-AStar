@@ -127,11 +127,18 @@ public class Main : SingletonBehaviour<Main>
 
         Config.isECSModel = true;
 
+        for (int i = 0; i < _obstacles.Count; i++)
+        {
+            // Destroy(_obstacles[i]);
+            _obstacles[i].AddComponent<ConvertToEntity>();
+        }
+
+        _obstacles.Clear();
+
         int size = _map.size;
         Entity mapEntity = _entityManager.CreateEntity();
         _entityManager.AddComponent<CompMapFlag>(mapEntity);
         DynamicBuffer<CompMap> compMaps = _entityManager.AddBuffer<CompMap>(mapEntity);
-
 
         for (int i = 0; i < size; i++)
         {
@@ -189,7 +196,7 @@ public class Main : SingletonBehaviour<Main>
                 }
             }
         }
-        StaticBatchingUtility.Combine(obstacleRoot.gameObject);
+        // StaticBatchingUtility.Combine(obstacleRoot.gameObject);
         EventManager.instance.DispatchEvent<int>(EventName.UpdateMapSize, size);
     }
 

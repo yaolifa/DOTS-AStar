@@ -10,7 +10,7 @@ public struct AstarJob : IJob
     public int2 gridSize;
     public NativeArray<PathNode> pathNodeArray;
     [ReadOnly]
-    public NativeArray<int2> neighbourOffsetArray;
+    public NativeArray<int2> direction;
     public int2 startPosition;
     public int2 endPosition;
     // [DeallocateOnJobCompletion]
@@ -48,9 +48,9 @@ public struct AstarJob : IJob
 
             closedHasMap.Add(currentNodeIndex, true);
 
-            for (int i = 0; i < neighbourOffsetArray.Length; i++)
+            for (int i = 0; i < direction.Length; i++)
             {
-                int2 neighbourOffset = neighbourOffsetArray[i];
+                int2 neighbourOffset = direction[i];
                 int2 neighbourPosition = new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
 
                 if (neighbourPosition.x < 0 || neighbourPosition.x >= gridSize.x || neighbourPosition.y < 0 || neighbourPosition.y >= gridSize.y)

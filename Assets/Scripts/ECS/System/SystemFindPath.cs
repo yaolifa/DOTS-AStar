@@ -7,21 +7,21 @@ using Unity.Mathematics;
 [UpdateAfter(typeof(SystemSetPathParam))]
 public class SystemFindPath : ComponentSystem
 {   
-    NativeArray<int2> neighbourOffsetArray;
+    NativeArray<int2> direction;
     List<IDisposable> disposables;
     protected override void OnCreate()
     {
         disposables = new List<IDisposable>();
-        neighbourOffsetArray = new NativeArray<int2>(4, Allocator.Persistent);
-        neighbourOffsetArray[0] = new int2(-1, 0);
-        neighbourOffsetArray[1] = new int2(1, 0);
-        neighbourOffsetArray[2] = new int2(0, 1);
-        neighbourOffsetArray[3] = new int2(0, -1);
+        direction = new NativeArray<int2>(4, Allocator.Persistent);
+        direction[0] = new int2(-1, 0);
+        direction[1] = new int2(1, 0);
+        direction[2] = new int2(0, 1);
+        direction[3] = new int2(0, -1);
     }
 
     protected override void OnDestroy()
     {
-        neighbourOffsetArray.Dispose();
+        direction.Dispose();
     }
 
     protected override void OnUpdate() {
@@ -47,7 +47,7 @@ public class SystemFindPath : ComponentSystem
                 pathNodeArray = tmpPathNodeArray,
                 openList = openList,
                 closedHasMap = closedHasMap,
-                neighbourOffsetArray = neighbourOffsetArray,
+                direction = direction,
                 startPosition = pathfindingParams.startPos,
                 endPosition = pathfindingParams.endPos,
                 entity = entity,
