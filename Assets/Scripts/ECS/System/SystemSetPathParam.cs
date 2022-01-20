@@ -19,7 +19,6 @@ public class SystemSetPathParam : SystemBase {
         int mapHeight = Main.instance.map.size;
         int count = mapWidth * mapHeight;
         EntityManager entityManager = World.EntityManager;
-        float3 originPosition = float3.zero;
         Entity map = GetSingletonEntity<CompMapFlag>();
         DynamicBuffer<CompMap> compMap = EntityManager.GetBuffer<CompMap>(map);
         EntityCommandBuffer ecb = _ecbSystem.CreateCommandBuffer();

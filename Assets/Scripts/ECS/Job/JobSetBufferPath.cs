@@ -5,7 +5,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 
 [BurstCompile]
-public struct SetBufferPathJob : IJob {
+public struct JobSetBufferPath : IJob {
     
     public int2 gridSize;
 

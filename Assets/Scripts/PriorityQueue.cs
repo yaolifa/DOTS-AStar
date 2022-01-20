@@ -47,7 +47,6 @@ public class PriorityQueue<T>
         T temp = list[childIndex];
         while (childIndex > 0 && comparer.Compare(temp, list[parentIndex]) < 0)
         {
-            // 无须真正交换，单向赋值即可
             list[childIndex] = list[parentIndex];
             childIndex = parentIndex;
             parentIndex = (parentIndex - 1) / 2;
@@ -66,12 +65,11 @@ public class PriorityQueue<T>
         int size = list.Count;
         while (childIndex < size)
         {
-            // 如果有右孩子，且右孩子小于左孩子的值，则定位到右孩子
             if (childIndex + 1 < size && comparer.Compare(list[childIndex + 1] , list[childIndex]) < 0)
             {
                 childIndex++;
             }
-            // 如果父节点小于于任何一个孩子的值，直接跳出
+
             if (comparer.Compare(temp, list[childIndex]) < 0)
             {
                 break;

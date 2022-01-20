@@ -5,7 +5,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 
 [BurstCompile]
-public struct AstarJob : IJob
+public struct JobAstar : IJob
 {
     public int2 gridSize;
     public NativeArray<PathNode> pathNodeArray;
